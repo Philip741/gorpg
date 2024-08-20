@@ -1,8 +1,9 @@
 package main
 
 import (
-	"go-learning/textrpg/game"
 	"log"
+
+	"github.com/Philip741/gorpg/game"
 )
 
 func main() {
