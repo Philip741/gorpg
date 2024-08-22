@@ -15,6 +15,7 @@ type Game struct {
 
 func New() (*Game, error) {
 	fmt.Println("Welcome to the TextRPG!")
+	// initialize the player
 	player, err := character.NewCharacter("Player", 100, 50)
 	if err != nil {
 		return nil, err
