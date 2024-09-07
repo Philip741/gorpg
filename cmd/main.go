@@ -22,8 +22,30 @@ func main() {
 	gameUI.UpdateGraphics("Welcome to the TextRPG!")
 	gameUI.UpdateCharacterStats("Character Stats will appear here")
 	gameUI.AppendGameText("Your adventure begins...")
-	gameUI.UpdateActions("[Move] [Attack] [Inventory]")
+	//gameUI.UpdateActions("[Move] [Attack] [Inventory]")
 	// run the ui
-	gameUI.Run()
+	//gameUI.Run()
+	go func() {
+		if err := gameUI.Run(); err != nil {
+			log.Fatalf("Error running UI: %v", err)
+		}
+	}()
+
+	// Main game loop
+	for {
+		select {
+		case input := <-gameUI.GetInputChannel():
+			switch input {
+			case "move":
+				gameUI.AppendGameText("You move forward.")
+			case "attack":
+				gameUI.AppendGameText("You attack.")
+			case "quit":
+				gameUI.AppendGameText("Thanks for playing!")
+				defer gameUI.Stop()
+				return
+			}
+		}
+	}
 
 }
