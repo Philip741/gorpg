@@ -1,6 +1,13 @@
 package ui
 
 import (
+	//"image"
+	//"log"\
+	"bytes"
+	"encoding/base64"
+	"image/jpeg"
+	"os"
+
 	"github.com/gdamore/tcell/v2"
 	"github.com/rivo/tview"
 )
@@ -8,7 +15,7 @@ import (
 // create UI struct
 type UI struct {
 	app            *tview.Application
-	graphics       *tview.TextView
+	graphics       *tview.Image
 	characterStats *tview.TextView
 	gameText       *tview.TextView
 	actions        *tview.Flex
@@ -21,7 +28,7 @@ type UI struct {
 func New() (*UI, error) {
 	ui := &UI{
 		app:            tview.NewApplication(),
-		graphics:       tview.NewTextView(),
+		graphics:       tview.NewImage(),
 		characterStats: tview.NewTextView(),
 		gameText:       tview.NewTextView(),
 		actions:        tview.NewFlex(),
@@ -124,8 +131,33 @@ func (ui *UI) Stop() {
 }
 
 // Add methods to update each section of the UI
-func (ui *UI) UpdateGraphics(content string) {
-	ui.graphics.SetText(content)
+func (ui *UI) UpdateGraphics(imagePath string) error {
+	//ui.graphics.SetText(content)
+	// Read the image file
+	gameImage, err := os.ReadFile(imagePath)
+	gameImageEncoded := base64.StdEncoding.EncodeToString(gameImage)
+	if err != nil {
+		return err
+	}
+	//img, _, err := image.Decode(bytes.NewReader(gameImage))
+	img, err := base64.StdEncoding.DecodeString(string(gameImageEncoded))
+	if err != nil {
+		return err
+	}
+	photo, _ := jpeg.Decode(bytes.NewReader(img))
+
+	image := tview.NewImage().
+		SetImage(photo).
+		SetSize(0, 0) // Set the size to 0, 0 to use the image's natural size
+
+		// Set the colors of the image
+	image.SetColors(tview.TrueColor)
+	image.SetDithering(tview.DitheringFloydSteinberg)
+
+	// Set the base64 encoded image in the tview Image component
+	ui.graphics.SetImage(photo)
+
+	return nil
 }
 func (ui *UI) UpdateCharacterStats(stats string) {
 	ui.characterStats.SetText(stats)
