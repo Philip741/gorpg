@@ -31,6 +31,10 @@ func main() {
 		}
 	}()
 
+	// load default image
+	if err := gameUI.UpdateGraphics("../assets/images/labyrinth.jpeg"); err != nil {
+		log.Printf("Error setting image: %v", err)
+	}
 	// Main game loop
 	for {
 		select {
