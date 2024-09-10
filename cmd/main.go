@@ -1,9 +1,11 @@
 package main
 
 import (
+	"fmt"
 	"log"
 
 	//"github.com/Philip741/gorpg/game"
+	"github.com/Philip741/gorpg/internal"
 	"github.com/Philip741/gorpg/ui"
 )
 
@@ -30,11 +32,24 @@ func main() {
 			log.Fatalf("Error running UI: %v", err)
 		}
 	}()
-
-	// load default image
-	if err := gameUI.UpdateGraphics("../assets/images/labyrinth.jpeg"); err != nil {
-		log.Printf("Error setting image: %v", err)
+	// list embedded images
+	images, err := internal.ListEmbeddedImages()
+	if err != nil {
+		log.Fatalf("Error listing embedded images: %v", err)
 	}
+	fmt.Println("Available images:", images)
+
+	// Use the first image in the list
+	if len(images) > 0 {
+		err := gameUI.UpdateGraphics(images[0])
+		if err != nil {
+			log.Printf("Error setting image: %v", err)
+		}
+	}
+	// // load default image
+	// if err := gameUI.UpdateGraphics("../assets/images/labyrinth.jpeg"); err != nil {
+	// 	log.Printf("Error setting image: %v", err)
+	// }
 	// Main game loop
 	for {
 		select {

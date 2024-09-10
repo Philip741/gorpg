@@ -3,11 +3,9 @@ package ui
 import (
 	//"image"
 	//"log"\
-	"bytes"
-	"encoding/base64"
-	"image/jpeg"
-	"os"
+	//"fmt"
 
+	"github.com/Philip741/gorpg/internal"
 	"github.com/gdamore/tcell/v2"
 	"github.com/rivo/tview"
 )
@@ -15,7 +13,7 @@ import (
 // create UI struct
 type UI struct {
 	app            *tview.Application
-	graphics       *tview.Image
+	graphics       *tview.TextView
 	characterStats *tview.TextView
 	gameText       *tview.TextView
 	actions        *tview.Flex
@@ -28,7 +26,7 @@ type UI struct {
 func New() (*UI, error) {
 	ui := &UI{
 		app:            tview.NewApplication(),
-		graphics:       tview.NewImage(),
+		graphics:       tview.NewTextView(),
 		characterStats: tview.NewTextView(),
 		gameText:       tview.NewTextView(),
 		actions:        tview.NewFlex(),
@@ -131,34 +129,41 @@ func (ui *UI) Stop() {
 }
 
 // Add methods to update each section of the UI
-func (ui *UI) UpdateGraphics(imagePath string) error {
-	//ui.graphics.SetText(content)
-	// Read the image file
-	gameImage, err := os.ReadFile(imagePath)
-	gameImageEncoded := base64.StdEncoding.EncodeToString(gameImage)
+func (ui *UI) UpdateGraphics(imageName string) error {
+	sixelData, err := internal.ProcessEmbeddedImage(imageName)
 	if err != nil {
 		return err
 	}
-	//img, _, err := image.Decode(bytes.NewReader(gameImage))
-	img, err := base64.StdEncoding.DecodeString(string(gameImageEncoded))
-	if err != nil {
-		return err
-	}
-	photo, _ := jpeg.Decode(bytes.NewReader(img))
 
-	image := tview.NewImage().
-		SetImage(photo).
-		SetSize(0, 0) // Set the size to 0, 0 to use the image's natural size
-
-		// Set the colors of the image
-	image.SetColors(tview.TrueColor)
-	image.SetDithering(tview.DitheringFloydSteinberg)
-
-	// Set the base64 encoded image in the tview Image component
-	ui.graphics.SetImage(photo)
+	// Update the graphics view with the sixel data
+	ui.app.QueueUpdateDraw(func() {
+		ui.graphics.Clear()
+		ui.graphics.Write([]byte("\x1b[H")) // Move cursor to top-left
+		ui.graphics.Write([]byte(sixelData))
+	})
 
 	return nil
 }
+
+// func (ui *UI) UpdateGraphics(imageName string) error {
+// 	// Clear the screen
+// 	fmt.Print("\033[2J")
+
+// 	// Move cursor to top-left corner
+// 	fmt.Print("\x1b[H")
+
+// 	// Process and display the embedded image
+// 	err := internal.ProcessEmbeddedImage(imageName)
+// 	if err != nil {
+// 		return err
+// 	}
+
+// 	// Wait for user input before redrawing the UI
+// 	fmt.Print("Press Enter to continue...")
+// 	fmt.Scanln()
+
+//		return nil
+//	}
 func (ui *UI) UpdateCharacterStats(stats string) {
 	ui.characterStats.SetText(stats)
 }
