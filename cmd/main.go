@@ -10,11 +10,6 @@ import (
 )
 
 func main() {
-	// initialize the game
-	//g, err := game.New()
-	//if err != nil {
-	//log.Fatal(err)
-	//}
 
 	// initialize the ui
 	gameUI, err := ui.New()
@@ -41,15 +36,13 @@ func main() {
 
 	// Use the first image in the list
 	if len(images) > 0 {
+		// Set the image in the UI
 		err := gameUI.UpdateGraphics(images[0])
 		if err != nil {
 			log.Printf("Error setting image: %v", err)
 		}
 	}
-	// // load default image
-	// if err := gameUI.UpdateGraphics("../assets/images/labyrinth.jpeg"); err != nil {
-	// 	log.Printf("Error setting image: %v", err)
-	// }
+
 	// Main game loop
 	for {
 		select {
