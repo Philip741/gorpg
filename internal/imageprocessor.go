@@ -6,7 +6,7 @@ import (
 	"io/ioutil"
 )
 
-//go:embed images/*.jpeg
+//go:embed images/*.txt
 var embeddedImages embed.FS
 
 // ProcessEmbeddedImage processes an embedded ascii image and returns it as a string
