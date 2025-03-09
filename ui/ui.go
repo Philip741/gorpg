@@ -23,6 +23,7 @@ type UI struct {
 	done           chan struct{}
 }
 
+// initialize the UI
 func New() (*UI, error) {
 	ui := &UI{
 		app:            tview.NewApplication(),
@@ -42,6 +43,7 @@ func New() (*UI, error) {
 		AddItem(ui.gameText, 0, 1, false)
 	actionsFlex := tview.NewFlex().SetDirection(tview.FlexRow)
 
+	//////Ui layout
 	// Set up the layout
 	grid := tview.NewGrid().
 		// set 3 rows and 2 columns
@@ -84,8 +86,8 @@ func New() (*UI, error) {
 
 	//ui.actions.AddItem(ui.moveButton, 0, 1, false)
 	//ui.actions.AddItem(ui.attackButton, 0, 1, false)
-
-	// Set up input handling
+	//
+	///////////////////// Input handling
 	ui.app.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
 		switch event.Key() {
 		case tcell.KeyRune:
@@ -128,42 +130,30 @@ func (ui *UI) Stop() {
 	ui.app.Stop()
 }
 
+// Get size of ui.app
+func (ui *UI) GetSize() (int, int) {
+	width, height := ui.GetSize()
+	return width, height
+}
+
+// ascii graphics
 // Add methods to update each section of the UI
 func (ui *UI) UpdateGraphics(imageName string) error {
-	sixelData, err := internal.ProcessEmbeddedImage(imageName)
+	asciiData, err := internal.ProcessEmbeddedImage(imageName)
 	if err != nil {
 		return err
 	}
-
-	// Update the graphics view with the sixel data
+	// write the ascii to the ui
+	// Update the graphics view with the text data
 	ui.app.QueueUpdateDraw(func() {
 		ui.graphics.Clear()
-		ui.graphics.Write([]byte("\x1b[H")) // Move cursor to top-left
-		ui.graphics.Write([]byte(sixelData))
+		ui.graphics.Write([]byte("\x1b")) // Move cursor to top-left
+		ui.graphics.Write([]byte(asciiData))
 	})
 
 	return nil
 }
 
-// func (ui *UI) UpdateGraphics(imageName string) error {
-// 	// Clear the screen
-// 	fmt.Print("\033[2J")
-
-// 	// Move cursor to top-left corner
-// 	fmt.Print("\x1b[H")
-
-// 	// Process and display the embedded image
-// 	err := internal.ProcessEmbeddedImage(imageName)
-// 	if err != nil {
-// 		return err
-// 	}
-
-// 	// Wait for user input before redrawing the UI
-// 	fmt.Print("Press Enter to continue...")
-// 	fmt.Scanln()
-
-//		return nil
-//	}
 func (ui *UI) UpdateCharacterStats(stats string) {
 	ui.characterStats.SetText(stats)
 }
@@ -171,10 +161,6 @@ func (ui *UI) UpdateCharacterStats(stats string) {
 func (ui *UI) AppendGameText(text string) {
 	ui.gameText.SetText(ui.gameText.GetText(true) + "\n" + text)
 }
-
-//func (ui *UI) Run() error {
-//	return ui.app.Run()
-//}
 
 func (ui *UI) GetInputChannel() <-chan string {
 	return ui.inputChan
